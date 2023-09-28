@@ -1,0 +1,66 @@
+version: "3"
+services:
+
+  retrieval-service:
+    build:
+      context: ./retrieval_service
+      dockerfile: Dockerfile.retrieval
+    ports:
+      - ${RETRIEVAL_SERVICE_PORT}:${RETRIEVAL_SERVICE_PORT}
+    environment:
+      - RETRIEVAL_SERVICE_PORT=${RETRIEVAL_SERVICE_PORT}
+    networks:
+      - my_network
+
+  query-engine:
+    build:
+      context: ./query_engine
+      dockerfile: Dockerfile.query
+    ports:
+      - ${QUERY_SERVICE_PORT}:${QUERY_SERVICE_PORT}
+    environment:
+      - QUERY_SERVICE_PORT=${QUERY_SERVICE_PORT}
+    networks:
+      - my_network
+
+  orchestrator:
+    build:
+      context: ./orchestrator
+      dockerfile: Dockerfile.orchestrator
+    ports:
+      - ${ORCHESTRATOR_PORT}:${ORCHESTRATOR_PORT}
+    environment:
+      - PROMPT_MANAGEMENT_SERVICE_PORT=${PROMPT_MANAGEMENT_SERVICE_PORT}
+      - INFERENCE_SERVICE_PORT=${INFERENCE_SERVICE_PORT}
+      - QUERY_SERVICE_PORT=${QUERY_SERVICE_PORT}
+      - RETRIEVAL_SERVICE_PORT=${RETRIEVAL_SERVICE_PORT}
+      - ORCHESTRATOR_PORT=${ORCHESTRATOR_PORT}
+    networks:
+      - my_network
+
+  prompt-manager:
+    build:
+      context: ./prompt_manager
+      dockerfile: Dockerfile.prompt
+    ports:
+      - ${PROMPT_MANAGEMENT_SERVICE_PORT}:${PROMPT_MANAGEMENT_SERVICE_PORT}
+    environment:
+      - PROMPT_MANAGEMENT_SERVICE_PORT=${PROMPT_MANAGEMENT_SERVICE_PORT}
+    networks:
+      - my_network
+
+  inference-service:
+    build:
+      context: ./inference_service
+      dockerfile: Dockerfile.inference
+    ports:
+      - ${INFERENCE_SERVICE_PORT}:${INFERENCE_SERVICE_PORT}
+    environment:
+      - QUERY_SERVICE_PORT=${QUERY_SERVICE_PORT}
+      - INFERENCE_SERVICE_PORT=${INFERENCE_SERVICE_PORT}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    networks:
+      - my_network
+
+networks:
+  my_network:
